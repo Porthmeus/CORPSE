@@ -27,6 +27,5 @@ setup(
         "pandas>=1.1.4",
         "numpy>=1.19.4",
         "joblib>=0.17.0"
-        ],
-    long_description = open("README.md","r").read()
+        ]
 )
