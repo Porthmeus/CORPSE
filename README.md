@@ -11,8 +11,7 @@ Simply use pip to install the package:
     pip install git+https://github.com/Porthmeus/CORPSE.git
 
 Alternatively clone/download the package and install it manually
-``
-git clone https://github.com/Porthmeus/CORPSE.git
-cd CORPSE
-python setup.py install
-``
+
+    git clone https://github.com/Porthmeus/CORPSE.git
+    cd CORPSE
+    python setup.py install
