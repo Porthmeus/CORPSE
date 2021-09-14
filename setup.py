@@ -15,16 +15,18 @@ setup(
     name='corpse',
     version='0.1.0',
     description='CObRaPy tool SEt - auxiliary functions for cobrapy',
-    author='Porthmeus',
+    url = 'https://github.com/Porthmeus/CORPSE',
+    author='Jan Taubenheim',
     author_email = "j.taubenheim@iem.uni-kiel.de",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license='MIT',
+    license='GPL3',
     packages=["corpse"],
     install_requires = [
         "cobra>=0.20.0",
         "pandas>=1.1.4",
         "numpy>=1.19.4",
         "joblib>=0.17.0"
-        ]
+        ],
+    long_description = open("README.md","r").read()
 )
