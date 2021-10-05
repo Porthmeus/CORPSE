@@ -6,11 +6,11 @@ import pandas as pd
 import numpy as np
 import re
 
-#class coreSetFinder:
-#    def __init__(self):
-#        self.name="coreSetFinder"
+class coreSetFinder:
+    def __init__(self):
+        self.name="coreSetFinder"
 
-def getCoreSet(
+def getCoreSet(self,
         array,
         global_lower = 0,
         global_upper = None,
