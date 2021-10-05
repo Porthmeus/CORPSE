@@ -10,7 +10,7 @@ class coreSetFinder:
     def __init__(self):
         self.name="coreSetFinder"
 
-    def getCoreSet(self,
+    def getCoreSet(
             array,
             global_lower = 0,
             global_upper = None,
