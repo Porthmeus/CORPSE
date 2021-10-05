@@ -12,7 +12,7 @@ class omicsMapper:
     def __init__(self):
         self.name = "omicsMapper"
 
-    def parseData(self,model, dataframe, column = 0, protein = False):
+    def parseData(model, dataframe, column = 0, protein = False):
         '''Takes a pandas.DataFrame with gene/protein expression data and a cobra.Model and extracts only those data in the DataFrame where the gene/protein ids of the model matches the index of the data frame and returns the values in a dic with index:value pairs.
     Keyword arguments:
         @ model - a cobra.Model object representing the metabolic model
@@ -55,7 +55,7 @@ class omicsMapper:
         return(df)
 
 
-    def mapGPR(self, gpr, expression, orIsSum = True):
+    def mapGPR(gpr, expression, orIsSum = True):
         '''The function evaluates a GPR exrpession and maps the expression to it.
     Keyword arguments:
         @ gpr - the gene reaction rule to evaluate
@@ -177,7 +177,7 @@ class omicsMapper:
         return(val,n)
 
 
-    def compareBinary(self, pairs, function):
+    def compareBinary(pairs, function):
         ''' compares two values either by sum, min or max - helper function for evalGPR '''
         if function == "sum":
             return(sum(pairs))
@@ -192,7 +192,7 @@ class omicsMapper:
         else:
             raise ValueError("Argument '{f}' for function is not defined".format(f = function))
 
-    def mapRxn(self, rxn, expression, protein =False, orIsSum = True):
+    def mapRxn(rxn, expression, protein =False, orIsSum = True):
         '''same as mapGPR only takes reaction object from a cobra.Model to map the expression values'''
         # check whether protein or gene reaction rule should be evaluated
         if protein:
@@ -203,13 +203,13 @@ class omicsMapper:
         # return the value
         return(val)
 
-    def mapSampleToModel(self, model, dataframe, column = 0, protein = False, orIsSum = True):
+    def mapSampleToModel(model, dataframe, column = 0, protein = False, orIsSum = True):
 
         dfx = parseData(model, dataframe = dataframe, column = column, protein = protein)
         vals = [mapRxn(rxn, expression = dfx, protein= protein, orIsSum= orIsSum) for rxn in model.reactions]
         return(vals)
 
-    def mapExpressionToReaction(self,
+    def mapExpressionToReaction(
             model,
             dataframe,
             column = None,
