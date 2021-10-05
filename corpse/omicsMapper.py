@@ -12,7 +12,7 @@ class omicsMapper:
     def __init__(self):
         self.name = "omicsMapper"
 
-    def parseData(model, dataframe, column = 0, protein = False):
+    def parseData(self, model, dataframe, column = 0, protein = False):
         '''Takes a pandas.DataFrame with gene/protein expression data and a cobra.Model and extracts only those data in the DataFrame where the gene/protein ids of the model matches the index of the data frame and returns the values in a dic with index:value pairs.
     Keyword arguments:
         @ model - a cobra.Model object representing the metabolic model
@@ -55,7 +55,7 @@ class omicsMapper:
         return(df)
 
 
-    def mapGPR(gpr, expression, orIsSum = True):
+    def mapGPR(self, gpr, expression, orIsSum = True):
         '''The function evaluates a GPR exrpession and maps the expression to it.
     Keyword arguments:
         @ gpr - the gene reaction rule to evaluate
@@ -116,7 +116,7 @@ class omicsMapper:
                         elif pairs[1] == None:
                             pairs[1] = expression[word]
                             word = ""
-                            pairs[0] = compareBinary(pairs, function = op)
+                            pairs[0] = self.compareBinary(pairs, function = op)
                             pairs[1] = None
                             op = ""
                         else:
@@ -131,14 +131,14 @@ class omicsMapper:
                 # otherwise evaluate it and return the result
                 else:
                     pairs[1] = expression[word]
-                    val = compareBinary(pairs, op)
+                    val = self.compareBinary(pairs, op)
                 #print("returned:" + str(val) +", "+str(n))
                 return(val,n)
             
             # if one encounters an opening bracket - recursively evaluate the
             # internal of the bracket and return the result
             elif gpr[n] == "(":
-                val,nn = mapGPR(gpr = gpr[n+1:], expression = expression, orIsSum= orIsSum)
+                val,nn = self.mapGPR(gpr = gpr[n+1:], expression = expression, orIsSum= orIsSum)
                 n = n+nn+1 # adjust the counter to after the bracket
                 # write the result in the correct position of the pair
                 if pairs[0] == None:
@@ -147,7 +147,7 @@ class omicsMapper:
                 elif pairs[1] == None:
                     pairs[1] = val
                     word = ""
-                    pairs[0] = compareBinary(pairs, function = op)
+                    pairs[0] = self.compareBinary(pairs, function = op)
                     pairs[1] = None
                     op =""
                 else:
@@ -168,7 +168,7 @@ class omicsMapper:
         # add the final word if not done yet and evaluat the final pair
         elif pairs[0] != None and pairs[1] == None and word != "":
             pairs[1] = expression[word]
-            val = compareBinary(pairs, function = op)
+            val = self.compareBinary(pairs, function = op)
         else:
             val = pairs[0]
 
@@ -177,7 +177,7 @@ class omicsMapper:
         return(val,n)
 
 
-    def compareBinary(pairs, function):
+    def compareBinary(self, pairs, function):
         ''' compares two values either by sum, min or max - helper function for evalGPR '''
         if function == "sum":
             return(sum(pairs))
@@ -192,24 +192,24 @@ class omicsMapper:
         else:
             raise ValueError("Argument '{f}' for function is not defined".format(f = function))
 
-    def mapRxn(rxn, expression, protein =False, orIsSum = True):
+    def mapRxn(self, rxn, expression, protein =False, orIsSum = True):
         '''same as mapGPR only takes reaction object from a cobra.Model to map the expression values'''
         # check whether protein or gene reaction rule should be evaluated
         if protein:
             gpr = rxn.gene_name_reaction_rule
         else:
             gpr = rxn.gene_reaction_rule
-        val,n = mapGPR(gpr = gpr, expression = expression, orIsSum= orIsSum)
+        val,n = self.mapGPR(gpr = gpr, expression = expression, orIsSum= orIsSum)
         # return the value
         return(val)
 
-    def mapSampleToModel(model, dataframe, column = 0, protein = False, orIsSum = True):
+    def mapSampleToModel(self, model, dataframe, column = 0, protein = False, orIsSum = True):
 
-        dfx = parseData(model, dataframe = dataframe, column = column, protein = protein)
-        vals = [mapRxn(rxn, expression = dfx, protein= protein, orIsSum= orIsSum) for rxn in model.reactions]
+        dfx = self.parseData(model, dataframe = dataframe, column = column, protein = protein)
+        vals = [self.mapRxn(rxn, expression = dfx, protein= protein, orIsSum= orIsSum) for rxn in model.reactions]
         return(vals)
 
-    def mapExpressionToReaction(
+    def mapExpressionToReaction(self,
             model,
             dataframe,
             column = None,
@@ -257,7 +257,7 @@ class omicsMapper:
         rxn_exp = pd.DataFrame(np.zeros((len(rxns),len(colnames))), index = rxns, columns = colnames,dtype = float)
 
         # iterate through the samples and get the relevant expression values - prefer "threads" is speeding up the process enormously
-        results = joblib.Parallel(n_jobs = num_cores, verbose = 10, prefer ="threads")(joblib.delayed(mapSampleToModel)(model = model,
+        results = joblib.Parallel(n_jobs = num_cores, verbose = 10, prefer ="threads")(joblib.delayed(self.mapSampleToModel)(model = model,
             dataframe = dataframe,
             column = sample,
             protein = protein,
