@@ -19,5 +19,34 @@ Alternatively clone/download the package and install it manually
     python setup.py install
 
 
+## Usage
+
+### Fastcore
+
+Here a simple example of how to use fastcore. First we load the E. coli model from cobrapy as a toy model and we take 5 random reactions as a core set.
+
+    import cobra
+    import cobra.test
+    import corpse
+    import random
+    
+    eco = cobra.test.create_test_model("textbook") # load the model
+    core_eco = random.sample([x.id for x in eco.reactions], 5) # sample 5 reactions
+    
+To run fastcore instantiate a fastcore object and call run():
+    
+    fast_mod = simpleFastcore(model = eco, core_set = core_eco)
+    core_mod = fast_mod.run()
+
+This will run fastcc and fastcore on the model and return the tissue specific model. One can run also only fastcc or fastcore on the model provided:
+    
+    # run only fastcc
+    fast_mod.fastcc()
+    consist_mod = fast_mod.get_model()
+
+    # run only fastcore
+    fast_mod.fastcore()
+    core_mod = fast_mod.get_model()
+
 ## TODO:
 Write a good documentation with examples how to use the library
