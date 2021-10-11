@@ -25,9 +25,8 @@ Alternatively clone/download the package and install it manually
 
 Here a simple example of how to use fastcore. First we load the E. coli model from cobrapy as a toy model and we take 5 random reactions as a core set.
 
-    import cobra
     import cobra.test
-    import corpse
+    from corpse import simpleFastcore
     import random
     
     eco = cobra.test.create_test_model("textbook") # load the model
@@ -47,6 +46,11 @@ This will run fastcc and fastcore on the model and return the tissue specific mo
     # run only fastcore
     fast_mod.fastcore()
     core_mod = fast_mod.get_model()
+
+To change the solver for the problems, simply change the solver of the initial model object provided:
+
+    eco.solver = "cplex"
+    fast_mod = simpleFastcore(model = eco, core_set = core_eco)
 
 ## TODO:
 Write a good documentation with examples how to use the library
