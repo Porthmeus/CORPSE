@@ -28,6 +28,7 @@ class simpleFastcore():
             raise ValueError("core_set needs to be either index of name_ID of reactions in the model")
 
         self.check_solver()
+        self.check_boundaries()
         self.status = ["initiated"]
         
     
@@ -58,7 +59,6 @@ class simpleFastcore():
     
     def fastcc(self):
         # this function wil return the consistent model
-        self.check_boundaries()
         # make a consistent model
         print("Creating consistent model")
         init_rxn = len(self.model.reactions)
