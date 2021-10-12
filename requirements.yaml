@@ -3,3 +3,5 @@ dependencies:
 - pandas>=1.1.4
 - cobra>=0.20.0
 - joblib>=0.17.0
+- troppo
+- cobamp
