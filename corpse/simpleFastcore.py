@@ -14,7 +14,7 @@ from os import devnull
 
 class simpleFastcore():
     ''' This class is an attempt to simplify the usage of fastcore - simply supply the model which should be used and a set of core reactions as a list of reaction IDs and call self.run() - and get the ready to use core model. All steps in between can be executed as well, see self.fastcc() and self.fastcore(). Note: these are all just wrappers for functions implemented in cobrapy, cobamp and troppo'''
-    def __init__(self, model, core_set, solver = None, max_boundaries = 1000, flux_threshold = 1E-4):
+    def __init__(self, model, core_set = [], solver = None, max_boundaries = 1000, flux_threshold = 1E-4):
 
         self.model = model.copy()
         self.solver = solver
@@ -100,18 +100,20 @@ class simpleFastcore():
             tictoc = str(round(toc-tictic,3)),
             no = i)) 
 
-        # map the core set to the ids of the model
-        self.core_idx = [i for i,x in enumerate(self.model.reactions) if x.id in self.core_set]
-        if len(self.core_idx) == 0:
-            raise ValueError("No core set left in the consistent model, check your input!")
         
         self.status.append("fastcc")
 
         return(self.model)
         
 
+
     def fastcore(self):
         # this function will return the specific model, make sure to run all preparation steps beforhand
+        # map the core set to the ids of the model
+        self.core_idx = [i for i,x in enumerate(self.model.reactions) if x.id in self.core_set]
+        if len(self.core_idx) == 0:
+            raise ValueError("No core set left in the model provided, check your input!")
+
         tic = time.perf_counter()
         # initiate the fastcore model 
         S = cb.util.create_stoichiometric_matrix(self.model)

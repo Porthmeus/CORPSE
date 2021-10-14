@@ -5,3 +5,5 @@ dependencies:
 - joblib>=0.17.0
 - troppo
 - cobamp
+- time
+- contextlib
