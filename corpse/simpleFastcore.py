@@ -7,6 +7,9 @@ import cobra as cb
 import cobamp as ca
 from troppo.methods.reconstruction.fastcore import FASTcore, FastcoreProperties
 import warnings
+import time
+from contextlib import contextmanager,redirect_stderr,redirect_stdout
+from os import devnull
 
 
 class simpleFastcore():
@@ -30,12 +33,19 @@ class simpleFastcore():
         self.check_solver()
         self.check_boundaries()
         self.status = ["initiated"]
+
+    @contextmanager
+    def suppress_stdout_stderr(self):
+        """A context manager that redirects stdout and stderr to devnull"""
+        with open(devnull, 'w') as fnull:
+            with redirect_stderr(fnull) as err, redirect_stdout(fnull) as out:
+                yield (err, out)
         
     
     def check_solver(self):
         if self.solver == None:
             self.solver = str(self.model.solver.interface.Model).split(".")[1].replace("_interface","").upper()
-        print("Will use " + self.solver + " for linear problems")
+        print("# Will use " + self.solver + " as linear problem solver")
     
     def check_boundaries(self):
         # check the solver which is selected and adjust infinity boundaries if necessary
@@ -43,7 +53,7 @@ class simpleFastcore():
             self.check_solver()
             self.check_boundaries()
 
-        print("Will adjust model boundaries which are set to inf/-inf and set it to " +str(self.max_boundaries))
+        print("# Will adjust model boundaries which are set to inf/-inf and set it to {boundary}/-{boundary}".format(boundary = str(self.max_boundaries)))
         inf = float("inf")
         for rxn in self.model.reactions:
             if rxn.upper_bound == inf:
@@ -59,14 +69,38 @@ class simpleFastcore():
     
     def fastcc(self):
         # this function wil return the consistent model
-        # make a consistent model
-        print("Creating consistent model")
-        init_rxn = len(self.model.reactions)
-        self.model = cb.flux_analysis.fastcc(model = self.model, flux_threshold = self.flux_threshold)
-        print("Reduced the initial model from {init} to {final} consistent model".format(init = str(init_rxn) , final = str(len(self.model.reactions)))) 
-        # get the cobamp model
-        #self.ca_model = ca.wrappers.COBRAModelObjectReader(self.model)    
-        # map the core set to the ids of the cobamp model
+        
+        # supress a warning which is usually thrown by cobrapy
+        warnings.filterwarnings("ignore", ".*need to pass in a list.*")
+        # get the number of reactions to initialize a loop and record some statistics
+        tictic = time.perf_counter()
+        init_rxn = len(self.model.reactions) 
+        cons_rxn = init_rxn +1
+        current_rxns = init_rxn
+        print("# Creating consistent model")
+        i = 0
+        print("Iteration\tNoInputRxns\tNoOutputRxn\tFracReduced\tTimeNeeded")
+        while cons_rxn != current_rxns:
+            current_rxns = cons_rxn
+            i = i+1
+            tic = time.perf_counter()
+            self.model = cb.flux_analysis.fastcc(model = self.model, flux_threshold = self.flux_threshold)
+            toc = time.perf_counter()
+
+            cons_rxn = len(self.model.reactions)
+            print(str(i)+ "\t" +
+                    str(current_rxns) + "\t" +
+                    str(cons_rxn) + "\t" + 
+                    str(round(1-cons_rxn/current_rxns,3)) + "\t" +
+                    str(round(toc-tic,2)))
+
+        print("# Reduced the initial model from {init} to {final} reactions ({frac}%) in the consistent model in {tictoc}s with {no} fastcc runs".format(init = str(init_rxn),
+            final = str(cons_rxn),
+            frac = str(round(1-cons_rxn/init_rxn,3)*100),
+            tictoc = str(round(toc-tictic,3)),
+            no = i)) 
+
+        # map the core set to the ids of the model
         self.core_idx = [i for i,x in enumerate(self.model.reactions) if x.id in self.core_set]
         if len(self.core_idx) == 0:
             raise ValueError("No core set left in the consistent model, check your input!")
@@ -78,21 +112,25 @@ class simpleFastcore():
 
     def fastcore(self):
         # this function will return the specific model, make sure to run all preparation steps beforhand
+        tic = time.perf_counter()
         # initiate the fastcore model 
         S = cb.util.create_stoichiometric_matrix(self.model)
         lb = [x.lower_bound for x in self.model.reactions]
         ub = [x.upper_bound for x in self.model.reactions]
         #lb,ub = self.ca_model.get_model_bounds(False, True)
-        fastcoresolver = FASTcore(S, lb, ub,
-                FastcoreProperties(core= self.core_idx,
-                    solver = self.solver,
-                    flux_threshold = self.flux_threshold)
-                )
+        with self.suppress_stdout_stderr():
+            fastcoresolver = FASTcore(S, lb, ub,
+                    FastcoreProperties(core= self.core_idx,
+                        solver = self.solver,
+                        flux_threshold = self.flux_threshold)
+                    )
 
-        # run fastcore
-        specific_idx = fastcoresolver.fastcore()
+            # run fastcore
+            specific_idx = fastcoresolver.fastcore()
+
         self.specific_idx_caMod = specific_idx
-        print("Fastcore is done, will adjust the model")
+        toc = time.perf_counter()
+        print("# Fastcore was done in {tictoc}s, will adjust the model".format(tictoc = str(round(toc-tic,3))))
 
         # get the specific model
         #specific_IDs = [x for i,x in enumerate(self.ca_model.r_ids) for i in specific_idx]
@@ -112,8 +150,10 @@ class simpleFastcore():
         return(self.model.copy())
 
     def run(self):
-
+        tic = time.perf_counter()
         self.fastcc()
         self.fastcore()
+        toc = time.perf_counter()
+        print("# Total runtime: " + str(round(toc-tic,3)) + "s")
         return(self.model.copy())
         
