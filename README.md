@@ -1,10 +1,11 @@
 # CORPSE - CObRaPy tool SEt
 CORPSE is an extension to the CobraPy environment to make some extra functionality - I initiated this because I missed functions for reconstruction of specific models.
 
-The toolset incudes functions for:
+The toolset includes functions for:
 + mapping gene expression values to reactions
 + get essential genes/rxn depending on the global lower and upper and local thresholds
 + calculate distances on FVA results for different samples/simulations of the same model 
++ extract tissue specific models using fastcore
 
 ## Installation
 
