@@ -13,7 +13,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='corpse',
-    version='0.1.0',
+    version='0.1.1',
     description='CObRaPy tool SEt - auxiliary functions for cobrapy',
     url = 'https://github.com/Porthmeus/CORPSE',
     author='Jan Taubenheim',
