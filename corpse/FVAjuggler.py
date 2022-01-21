@@ -12,7 +12,11 @@ class FVAjuggler:
         self.name = "FVAjuggler"
 
     def filterFVA(self,min_mat, max_mat, method ="any"):
-        # filter the FVA results by variance
+        '''filter the FVA results by variance
+        @ min_mat,max_mat = the matrix containing values for the lower (min) and upper (max) bounds of each reaction and sample
+        @ method = one of "any" or "all", defines if both (all) variances for lower and upper bound or just one (any) must be above 0 do stay in the data set.
+        '''
+        
 
         # remove numerical stuff
         min_mat[np.absolute(min_mat) < 1E-6] = 0
@@ -38,8 +42,11 @@ class FVAjuggler:
         return(min_mat, max_mat)
 
     def clusterFVA(self, min_mat, max_mat, thrld = 0.75):
-        # clusters the data by correlation and returns the most representative data point for each cluster
-        # thrld - defines the minimum correlation within one cluster, should range between 0 and 1
+        '''clusters the data by correlation and returns the most representative data point for each cluster
+        @ min_mat,max_mat = the matrix containing values for the lower (min) and upper (max) bounds of each reaction and sample
+        @thrld - defines the minimum correlation within one cluster, should range between 0 and 1
+        '''
+
         
         if thrld < 0 or thrld > 1:
             raise ValueError("thrld must range between 0 and 1")
@@ -129,10 +136,10 @@ class FVAjuggler:
             
 
     def calcFVAdistPerSamplePair(self, min_mat, max_mat, dist_method = "Moors", filt_method = "any", cluster = True):
-        # calculate a distance matrix for all sample pairs and reaction, but do the calculation for each sample across all reactions first - this is should be much faster computationally 
-        # dist_method is either "Moors" or "Taub" or "Jacc"
-        # filt_method is either "any" or "all"
-        
+        ''' calculate a distance matrix for all sample pairs and reaction, but do the calculation for each sample across all reactions first - this is should be much faster computationally 
+        @dist_method is either "Moors" or "Taub" or "Jacc"
+        @filt_method is either "any" or "all"
+        '''
         # pre filter or cluster the data
         if cluster:
             min_mat,max_mat,cluster = clusterFVA(min_mat, max_mat)
@@ -162,9 +169,10 @@ class FVAjuggler:
         return(d3, cluster)
 
     def calcFVAdistPerRxn(self, min_mat, max_mat, dist_method = "Moors", filt_method = "any", cluster = True):
-        # calculate a distance matrix for all sample pairs and reaction, but do the calculation for each reaction across all sample pairs first - this is should be slower in computation, but has the advantage to filter results already early
-        # dist_method is either "Moors" or "Taub" or "Jacc"
-        # filt_method is either "any" or "all"
+        ''' calculate a distance matrix for all sample pairs and reaction, but do the calculation for each reaction across all sample pairs first - this is should be slower in computation, but has the advantage to filter results already early
+        @dist_method is either "Moors" or "Taub" or "Jacc"
+        @filt_method is either "any" or "all"
+        '''
 
         # pre filter or cluster the data
         if cluster:

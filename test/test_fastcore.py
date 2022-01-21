@@ -10,11 +10,22 @@ import pandas as pd
 
 # simple test
 eco = cobra.test.create_test_model("textbook") # load the model
-core_eco = random.sample([x.id for x in eco.reactions], 5) # sample 5 reactions
 
-fast_mod = simpleFastcore(model = eco)
-cnst_mod = fast_mod.fastcc()
-core_mod = fast_mod.run()
+fast_mod = simpleFastcore(model = eco, core_set = core_eco)
+fast_mod.run()
+fast_mod.fastcc()
+core_eco = random.sample([x.id for x in fast_mod.model.reactions], 5) # sample 5 reactions
+fast_mod.set_core_set(core_eco)
+
+fast_mod.reset_model()
+fast_mod.FVA_consistency()
+fast_mod.fastcore()
+
+fast_mod.reset_model()
+fast_mod.fastcc_repeat()
+fast_mod.fastcore()
+
+core_mod = fast_mod.get_model()
 
 
 eco.solver = "glpk"
@@ -42,11 +53,23 @@ for rxn in dietRxn:
 core_set = [x for x in core_set.index if core_set.loc[x][0] == 1]
 
 mod_cplex = simpleFastcore(model = mod, core_set = core_set)
-mod_cplex.run()
+mod1 =mod_cplex.run()
 
 mod.solver = "glpk"
 mod_glpk = simpleFastcore(mod, core_set = core_set)
-mod_glpk.run()
+mod2 = mod_glpk.run()
+mod_glpk.reset_model()
+mod3 = mod_glpk.run()
+
+
+mod_glpk.reset_model()
+mod_glpk.FVA_consistency()
+mod_glpk.fastcore()
+mod4 = mod_glpk.get_model()
+mod_glpk.reset_model()
+mod_glpk.FVA_consistency()
+mod_glpk.fastcore()
+mod5 = mod_glpk.get_model()
 
 eco = cobra.test.create_test_model("textbook")
 core_eco = random.sample([x.id for x in eco.reactions], 5)
