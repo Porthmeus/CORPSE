@@ -26,11 +26,11 @@ Alternatively clone/download the package and install it manually
 
 Here a simple example of how to use fastcore. First we load the E. coli model from cobrapy as a toy model and we take 5 random reactions as a core set.
 
-    import cobra.test
+    import cobra
     from corpse import simpleFastcore
     import random
     
-    eco = cobra.test.create_test_model("textbook") # load the model
+    eco = cobra.io.load_model("textbook") # load the model
     core_eco = random.sample([x.id for x in eco.reactions], 5) # sample 5 reactions
     
 To run fastcore instantiate a fastcore object and call run():
