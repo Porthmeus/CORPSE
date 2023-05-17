@@ -53,5 +53,21 @@ To change the solver for the problems, simply change the solver of the initial m
     eco.solver = "cplex"
     fast_mod = simpleFastcore(model = eco, core_set = core_eco)
 
+### Omics Mapper
+
+To define the active reactions, usually one uses omics data to map these to the reactions. `corpse` offers to map transcriptomic or proteomic data (or any other measure which can be associated to genes/proteins) to the model in questions. Given you have transcriptomic data where the rows contain genes and the columns samples one can use the following code to map.
+
+```
+import corpse
+import cobra
+import pandas
+
+mod = cobra.io.read_sbml_model("path/to/model.xml")
+df = pandas.read_csv("path/to/csv", index_col = 0)
+mapper = corpse.omicsMapper()
+RAS_df = reaction_activity_score = mapExpressionToReaction(model = mod, dataframe = df)
+```
+Set `protein = True` if you want to use the gene names instead of the IDs of the model.
+
 ## TODO:
 Write a good documentation with examples how to use the library
