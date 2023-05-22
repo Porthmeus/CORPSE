@@ -65,7 +65,7 @@ import pandas
 mod = cobra.io.read_sbml_model("path/to/model.xml")
 df = pandas.read_csv("path/to/csv", index_col = 0)
 mapper = corpse.omicsMapper()
-RAS_df = reaction_activity_score = mapExpressionToReaction(model = mod, dataframe = df)
+RAS_df = mapper.mapExpressionToReaction(model = mod, dataframe = df)
 ```
 Set `protein = True` if you want to use the gene names instead of the IDs of the model.
 
