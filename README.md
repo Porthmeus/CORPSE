@@ -69,5 +69,9 @@ RAS_df = mapper.mapExpressionToReaction(model = mod, dataframe = df)
 ```
 Set `protein = True` if you want to use the gene names instead of the IDs of the model.
 
+### Core set finder
+
+Check out the coreSetFinder function - it is an easy way to apply different thresholding strategies like global and local thresholds and eases up the process of finding the right threshold setting for the given project.
+
 ## TODO:
 Write a good documentation with examples how to use the library
