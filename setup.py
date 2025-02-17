@@ -25,7 +25,7 @@ setup(
     install_requires = [
         "cobra>=0.20.0",
         "pandas>=1.1.4",
-        "numpy>=1.19.4",
+        "numpy>=1.19.4<1.25",
         "joblib>=0.17.0",
         "scipy>=1.5.4",
         "troppo",
